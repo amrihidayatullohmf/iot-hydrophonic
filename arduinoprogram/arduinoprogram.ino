@@ -22,7 +22,7 @@ IPAddress myDns(192, 168, 0, 1);
 EthernetClient client;
 
 //Constants
-#define DHTPIN 10     // what pin we're connected to
+#define DHTPIN 6     // what pin we're connected to
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
 
