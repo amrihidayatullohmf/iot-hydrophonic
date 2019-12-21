@@ -1,6 +1,7 @@
 
 #include <SPI.h>
 #include <Ethernet.h>
+#include <DHT.h>
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
@@ -20,11 +21,20 @@ IPAddress myDns(192, 168, 0, 1);
 // that you want to connect to (port 80 is default for HTTP):
 EthernetClient client;
 
+//Constants
+#define DHTPIN 10     // what pin we're connected to
+#define DHTTYPE DHT22   // DHT 22  (AM2302)
+DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
+
 int counter = 5;
 const int trigPin = 8;
 const int echoPin = 9;
 long duration;
 int distance;
+
+int chk;
+float hum;  //Stores humidity value
+float temp; //Stores temperature value
 
 // Variables to measure the speed
 unsigned long beginMicros, endMicros;
@@ -43,6 +53,7 @@ void setup() {
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  dht.begin();
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -81,6 +92,8 @@ void setup() {
 void loop() {
   if (client.connect(server, 80)) {
     Serial.println("Calculating Distance");
+
+    // Menghitung Jarak Air
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
     // Sets the trigPin on HIGH state for 10 micro seconds
@@ -93,11 +106,39 @@ void loop() {
     distance= duration*0.034/2;
     Serial.print("Distance :");
     Serial.println(distance);
+
+    //Menghitung TDS/EC
+
+
+    //Menghitung Humidity & Temperature
+    delay(300);
+    //Read data and store it to variables hum and temp
+    hum = dht.readHumidity();
+    temp= dht.readTemperature();
+    //Print temp and humidity values to serial monitor
+    Serial.print("Humidity: ");
+    Serial.print(hum);
+    Serial.print(" %, Temp: ");
+    Serial.print(temp);
+    Serial.println(" Celsius");
+    delay(300); 
+    
+    
     Serial.print("connected to ");
     Serial.println(client.remoteIP());
     // Make a HTTP request:
     client.print("GET /hydrophonic/plant.php?wl=");
     client.print(distance);
+    //client.print("&ph=");
+    //client.print(ph);
+    //client.print("&tds=");
+    //client.print(tds);
+    //client.print("&ec=");
+    //client.print(ec);
+    client.print("&tmp=");
+    client.print(temp);
+    client.print("&hum=");
+    client.print(hum);
     client.println(" HTTP/1.1");
     client.println("Host: www.telebot.stg02.mobileforce.mobi");
     client.println("Connection: close");
