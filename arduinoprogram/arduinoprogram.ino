@@ -26,7 +26,7 @@ EthernetClient client;
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
 
-#define TdsSensorPin A1
+#define TdsSensorPin A5
 #define VREF 5.0      // analog reference voltage(Volt) of the ADC
 #define SCOUNT  30           // sum of sample point
 int analogBuffer[SCOUNT];    // store the analog value in the array, read from ADC
@@ -52,21 +52,15 @@ unsigned long byteCount = 0;
 bool printWebData = true;  // set to false for better speed measurement
 
 void setup() {
-  // You can use Ethernet.init(pin) to configure the CS pin
-  //Ethernet.init(10);  // Most Arduino shields
-  //Ethernet.init(5);   // MKR ETH shield
-  //Ethernet.init(0);   // Teensy 2.0
-  //Ethernet.init(20);  // Teensy++ 2.0
-  //Ethernet.init(15);  // ESP8266 with Adafruit Featherwing Ethernet
-  //Ethernet.init(33);  // ESP32 with Adafruit Featherwing Ethernet
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  /**pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   digitalWrite(trigPin, LOW);
-  pinMode(TdsSensorPin,INPUT);
+  **/pinMode(TdsSensorPin,INPUT);/**
   pinMode(pumpPin,OUTPUT);
   // Open serial communications and wait for port to open:
-  Serial.begin(115200);
+  **/Serial.begin(115200);/**
   dht.begin();
+  **/
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -103,22 +97,46 @@ void setup() {
 }
 
 void loop() {
-  if (client.connect(server, 80)) {
-    Serial.println("Calculating Distance");
 
-    pumpOn();
+//  if (client.connect(server, 80)) {    
+//    Serial.print("connected to ");
+//    Serial.println(client.remoteIP());
+//    // Make a HTTP request:
+//    client.print("GET /hydrophonic/plant.php?wl=");
+//    client.print(distance);
+//    //client.print("&ph=");
+//    //client.print(ph);
+//    client.print("&tds=");
+//    client.print(tdsValue);
+//    //client.print("&ec=");
+//    //client.print(ec);
+//    client.print("&tmp=");
+//    client.print(temp);
+//    client.print("&hum=");
+//    client.print(hum);
+//    client.println(" HTTP/1.1");
+//    client.println("Host: www.telebot.stg02.mobileforce.mobi");
+//    client.println("Connection: close");
+//    client.println();
+//  } else {
+//    // if you didn't get a connection to the server:
+//    Serial.println("connection failed");
+//  }
+//  //counter += 10;
+//  _delay(5000);
+//  
+//  Serial.print("time spend ");
+//  Serial.println(timeCounter);
 
-    // Menghitung Jarak Air
-    digitalWrite(trigPin, HIGH);
-    _delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-    duration = pulseIn(echoPin, HIGH);
-    distance= (0.0001*((float)duration*340.0)/2.0)+1;
-    Serial.print(distance);
-    Serial.println(" cm"); 
-    delay(2000);
+//    pumpOn();
+    tdsEc();
+//    jarakAir();
+//    humidity();
 
-    //Menghitung TDS/EC
+}
+
+void tdsEc(){
+  //Menghitung TDS/EC
     static unsigned long analogSampleTimepoint = millis();
    if(millis()-analogSampleTimepoint > 40U)     //every 40 milliseconds,read the analog value from the ADC
    {
@@ -145,10 +163,24 @@ void loop() {
       Serial.print(tdsValue,0);
       Serial.println("ppm");
    }
+}
 
+void jarakAir(){
+  // Menghitung Jarak Air
+    Serial.println("Calculating Distance");
+    digitalWrite(trigPin, HIGH);
+    _delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);
+    distance= (0.0001*((float)duration*340.0)/2.0)+1;
+    Serial.print(distance);
+    Serial.println(" cm"); 
+//    delay(2000);
+}
 
-    //Menghitung Humidity & Temperature
-    _delay(300);
+void humidity(){
+  //Menghitung Humidity & Temperature
+//    _delay(300);
     //Read data and store it to variables hum and temp
     hum = dht.readHumidity();
     temp= dht.readTemperature();
@@ -158,37 +190,7 @@ void loop() {
     Serial.print(" %, Temp: ");
     Serial.print(temp);
     Serial.println(" Celsius");
-    _delay(300); 
-    
-    
-    Serial.print("connected to ");
-    Serial.println(client.remoteIP());
-    // Make a HTTP request:
-    client.print("GET /hydrophonic/plant.php?wl=");
-    client.print(distance);
-    //client.print("&ph=");
-    //client.print(ph);
-    client.print("&tds=");
-    client.print(tdsValue);
-    //client.print("&ec=");
-    //client.print(ec);
-    client.print("&tmp=");
-    client.print(temp);
-    client.print("&hum=");
-    client.print(hum);
-    client.println(" HTTP/1.1");
-    client.println("Host: www.telebot.stg02.mobileforce.mobi");
-    client.println("Connection: close");
-    client.println();
-  } else {
-    // if you didn't get a connection to the server:
-    Serial.println("connection failed");
-  }
-  //counter += 10;
-  _delay(5000);
-  
-  Serial.print("time spend ");
-  Serial.println(timeCounter);
+//    _delay(300); 
 }
 
 int getMedianNum(int bArray[], int iFilterLen) 
