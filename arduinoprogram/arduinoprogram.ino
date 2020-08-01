@@ -61,6 +61,7 @@ void setup() {
   //Ethernet.init(33);  // ESP32 with Adafruit Featherwing Ethernet
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  digitalWrite(trigPin, LOW);
   pinMode(TdsSensorPin,INPUT);
   pinMode(pumpPin,OUTPUT);
   // Open serial communications and wait for port to open:
@@ -108,18 +109,14 @@ void loop() {
     pumpOn();
 
     // Menghitung Jarak Air
-    digitalWrite(trigPin, LOW);
-    _delayMicroseconds(2);
-    // Sets the trigPin on HIGH state for 10 micro seconds
     digitalWrite(trigPin, HIGH);
     _delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
-    // Reads the echoPin, returns the sound wave travel time in microseconds
     duration = pulseIn(echoPin, HIGH);
-    // Calculating the distance
-    distance= duration*0.034/2;
-    Serial.print("Distance :");
-    Serial.println(distance);
+    distance= (0.0001*((float)duration*340.0)/2.0)+1;
+    Serial.print(distance);
+    Serial.println(" cm"); 
+    delay(2000);
 
     //Menghitung TDS/EC
     static unsigned long analogSampleTimepoint = millis();
