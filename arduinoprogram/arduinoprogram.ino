@@ -39,6 +39,8 @@ const int trigPin = 8;
 const int echoPin = 9;
 long duration;
 int distance;
+const int pumpPin = 5;
+float timeCounter = 0;
 
 int chk;
 float hum;  //Stores humidity value
@@ -60,8 +62,9 @@ void setup() {
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   pinMode(TdsSensorPin,INPUT);
+  pinMode(pumpPin,OUTPUT);
   // Open serial communications and wait for port to open:
-  Serial.begin(9600);
+  Serial.begin(115200);
   dht.begin();
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -102,12 +105,14 @@ void loop() {
   if (client.connect(server, 80)) {
     Serial.println("Calculating Distance");
 
+    pumpOn();
+
     // Menghitung Jarak Air
     digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
+    _delayMicroseconds(2);
     // Sets the trigPin on HIGH state for 10 micro seconds
     digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
+    _delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
     // Reads the echoPin, returns the sound wave travel time in microseconds
     duration = pulseIn(echoPin, HIGH);
@@ -146,7 +151,7 @@ void loop() {
 
 
     //Menghitung Humidity & Temperature
-    delay(300);
+    _delay(300);
     //Read data and store it to variables hum and temp
     hum = dht.readHumidity();
     temp= dht.readTemperature();
@@ -156,7 +161,7 @@ void loop() {
     Serial.print(" %, Temp: ");
     Serial.print(temp);
     Serial.println(" Celsius");
-    delay(300); 
+    _delay(300); 
     
     
     Serial.print("connected to ");
@@ -183,8 +188,10 @@ void loop() {
     Serial.println("connection failed");
   }
   //counter += 10;
-  delay(5000);
+  _delay(5000);
   
+  Serial.print("time spend ");
+  Serial.println(timeCounter);
 }
 
 int getMedianNum(int bArray[], int iFilterLen) 
@@ -210,4 +217,22 @@ int getMedianNum(int bArray[], int iFilterLen)
       else
     bTemp = (bTab[iFilterLen / 2] + bTab[iFilterLen / 2 - 1]) / 2;
       return bTemp;
+}
+
+void _delay(float miliseconds) 
+{
+  timeCounter += miliseconds;
+  delay((int)miliseconds);
+}
+
+void _delayMicroseconds(float microseconds) 
+{
+  timeCounter += microseconds / 1000;
+  delayMicroseconds((int)microseconds);
+}
+
+void pumpOn() {
+  digitalWrite(pumpPin, HIGH);
+  _delay(5000);
+  digitalWrite(pumpPin, LOW);
 }
