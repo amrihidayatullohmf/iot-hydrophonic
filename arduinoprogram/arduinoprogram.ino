@@ -113,7 +113,7 @@ void loop() {
     _delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
     duration = pulseIn(echoPin, HIGH);
-    distance= 0.0001*((float)duration*340.0)/2.0;
+    distance= (0.0001*((float)duration*340.0)/2.0)+1;
     Serial.print(distance);
     Serial.println(" cm"); 
     delay(2000);
