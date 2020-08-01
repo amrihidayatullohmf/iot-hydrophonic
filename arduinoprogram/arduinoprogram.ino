@@ -52,15 +52,15 @@ unsigned long byteCount = 0;
 bool printWebData = true;  // set to false for better speed measurement
 
 void setup() {
-  /**pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   digitalWrite(trigPin, LOW);
-  **/pinMode(TdsSensorPin,INPUT);/**
+  pinMode(TdsSensorPin,INPUT);
   pinMode(pumpPin,OUTPUT);
   // Open serial communications and wait for port to open:
-  **/Serial.begin(115200);/**
+  Serial.begin(115200);
   dht.begin();
-  **/
+ 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -98,40 +98,41 @@ void setup() {
 
 void loop() {
 
-//  if (client.connect(server, 80)) {    
-//    Serial.print("connected to ");
-//    Serial.println(client.remoteIP());
-//    // Make a HTTP request:
-//    client.print("GET /hydrophonic/plant.php?wl=");
-//    client.print(distance);
-//    //client.print("&ph=");
-//    //client.print(ph);
-//    client.print("&tds=");
-//    client.print(tdsValue);
-//    //client.print("&ec=");
-//    //client.print(ec);
-//    client.print("&tmp=");
-//    client.print(temp);
-//    client.print("&hum=");
-//    client.print(hum);
-//    client.println(" HTTP/1.1");
-//    client.println("Host: www.telebot.stg02.mobileforce.mobi");
-//    client.println("Connection: close");
-//    client.println();
-//  } else {
-//    // if you didn't get a connection to the server:
-//    Serial.println("connection failed");
-//  }
-//  //counter += 10;
-//  _delay(5000);
-//  
-//  Serial.print("time spend ");
-//  Serial.println(timeCounter);
-
+  if (client.connect(server, 80)) { 
+  
 //    pumpOn();
     tdsEc();
-//    jarakAir();
-//    humidity();
+    jarakAir();
+    humidity();
+   
+    Serial.print("connected to ");
+    Serial.println(client.remoteIP());
+    // Make a HTTP request:
+    client.print("GET /hydrophonic/plant.php?wl=");
+    client.print(distance);
+    //client.print("&ph=");
+    //client.print(ph);
+    client.print("&tds=");
+    client.print(tdsValue);
+    //client.print("&ec=");
+    //client.print(ec);
+    client.print("&tmp=");
+    client.print(temp);
+    client.print("&hum=");
+    client.print(hum);
+    client.println(" HTTP/1.1");
+    client.println("Host: www.telebot.stg02.mobileforce.mobi");
+    client.println("Connection: close");
+    client.println();
+  } else {
+    // if you didn't get a connection to the server:
+    Serial.println("connection failed");
+  }
+  //counter += 10;
+  _delay(5000);
+  
+  Serial.print("time spend ");
+  Serial.println(timeCounter);
 
 }
 
@@ -173,6 +174,7 @@ void jarakAir(){
     digitalWrite(trigPin, LOW);
     duration = pulseIn(echoPin, HIGH);
     distance= (0.0001*((float)duration*340.0)/2.0)+1;
+    distance = 12-distance;
     Serial.print(distance);
     Serial.println(" cm"); 
 //    delay(2000);
