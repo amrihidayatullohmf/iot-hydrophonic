@@ -26,5 +26,10 @@ void loop() {
     // if you didn't get a connection to the server:
     Serial.println("connection failed");
   }
+
+  if (client.available()) {
+    char c = client.read();
+    Serial.print(c);
+  }
   _delay(5000);
 }
